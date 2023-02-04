@@ -1,0 +1,5 @@
+apiVersion: v2
+name: k8sss
+version: 0.1.0
+description: A library chart that provides helpers to define init containers that
+  verify live Service endpoint counts are at an expected number, or a Job has successfully completed.
