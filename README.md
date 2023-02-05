@@ -72,13 +72,13 @@ If you are managing your resources in a helm chart, you can simply depend on the
 
 #### Changing the image in the init container
 
-You can update the k8sss image name and image pull policy by setting the `k8sss.image` and `k8sss.imagePullPolicy` values on the library chart dependency, e.g. in your `Chart.yaml`:
+You can update the k8sss image name and image pull policy by setting the `global.k8sss.image` and `global.k8sss.imagePullPolicy` values on the library chart dependent, e.g. in your Chart.
 
 ```bash
 dependencies:
 - name: k8sss
-  version: "~1.0.0"
-  repository: https://andlaz.github.io/helm-charts
+  version: "~0.2"
+  repository: https://oss.andlaz.io/k8sss
 ```
 
 Then, at helm install time ( or in values.yaml ):
@@ -86,8 +86,8 @@ Then, at helm install time ( or in values.yaml ):
 helm upgrade --install \
     my-release \
     my-chart \
-    --set k8sss.image=some/other:image \
-    --set k8sss.imagePullPolicy=Never # preloaded
+    --set global.k8sss.image=some/other:image \
+    --set global.k8sss.imagePullPolicy=Never # preloaded
 ```
 
 ## Alternatives
