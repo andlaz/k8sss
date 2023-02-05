@@ -49,7 +49,8 @@ pub(crate) async fn begin_watching_service(
                 Ok(service) => {
                     match endpoint_slices
                         .list(
-                            &ListParams::default().labels(&format!("kubernetes.io/service-name={}", name)),
+                            &ListParams::default()
+                                .labels(&format!("kubernetes.io/service-name={}", name)),
                         )
                         .await
                     {
