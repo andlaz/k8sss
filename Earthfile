@@ -99,6 +99,6 @@ version:
     DO +BUILD_DEPS
 
     RUN cd /repo && \
-        /tools/dotnet-gitversion /config gitversion.yml | yq -r .LegacySemVer > version
+        /tools/dotnet-gitversion /config gitversion.yml | jq -r .LegacySemVer > version
 
     SAVE ARTIFACT /repo/version
