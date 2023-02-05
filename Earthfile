@@ -75,7 +75,7 @@ image:
     ARG save_cmd="SAVE_IMAGE"
     ARG name="k8sss"
     ARG --required tags
-    DO .+${save_cmd} --image_name=$name --tag=$tags
+    DO .+${save_cmd} --image_name=$name --tags=$tags
 
 chart:
     FROM debian:buster
