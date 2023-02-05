@@ -34,7 +34,7 @@
 {{- $args := . -}}
 {{- $namespace := index $args 0}}
 {{- $name := index $args 1}}
-{{- $image := .Values.image }}
+{{- $image := $.Values.image }}
 - name: wait-for-{{ $name }}
     image: {{ $image }}
     imagePullPolicy: {{ .Values.imagePullPolicy }}
