@@ -29,7 +29,6 @@ jobs:
 
   container:
     needs: tests
-    image: ghcr.io/earthly/earthly:v0.6.30
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
