@@ -11,7 +11,7 @@
   {{ if (include "k8sss.debug" $g) -}}
   env:
   - name: RUST_LOG
-  value: "debug"
+    value: "debug"
   {{ end}}
   resources:
     requests:
@@ -32,7 +32,7 @@
   {{ if (include "k8sss.debug" $g) -}}
   env:
   - name: RUST_LOG
-  value: "debug"
+    value: "debug"
   {{ end -}}
   resources:
     requests:
@@ -52,7 +52,7 @@
   {{ if (include "k8sss.debug" $g) -}}
   env:
   - name: RUST_LOG
-  value: "debug"
+    value: "debug"
   {{ end -}}
   resources:
     requests:
