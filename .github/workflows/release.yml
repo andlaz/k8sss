@@ -55,7 +55,9 @@ jobs:
       - name: Determine version
         shell: bash
         run: |
-          for remote in `git branch -r`; do git branch --track ${remote#origin/} $remote; done && \
+          for ref in `git branch -r | grep origin | grep -v HEAD | grep -v 'pull/'`; do \
+            git branch --track ${ref#origin/} $ref; \
+          done && \
           git fetch --all && \
           git pull --all && \
           earthly --artifact +version/version version && \
