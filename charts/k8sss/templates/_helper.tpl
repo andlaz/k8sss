@@ -3,7 +3,7 @@
 {{- $namespace := index $args 0}}
 {{- $name := index $args 1}}
 {{- $lte := index $args 2}}
-{{- $image := .Values.image }}
+{{- $image := $.Values.image }}
 - name: wait-for-{{ $name }}
   image: {{ $image }}
   imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -19,7 +19,7 @@
 {{- $namespace := index $args 0}}
 {{- $name := index $args 1}}
 {{- $gte := index $args 2}}
-{{- $image := .Values.image }}
+{{- $image := $.Values.image }}
 - name: wait-for-{{ $name }}
   image: {{ $image }}
   imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -34,7 +34,7 @@
 {{- $args := . -}}
 {{- $namespace := index $args 0}}
 {{- $name := index $args 1}}
-{{- $image := .Values.image }}
+{{- $image := $.Values.image }}
 - name: wait-for-{{ $name }}
     image: {{ $image }}
     imagePullPolicy: {{ .Values.imagePullPolicy }}
