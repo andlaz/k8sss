@@ -31,10 +31,24 @@ jobs:
       - name: Log in to ghcr.io
         run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Determine version
+        shell: bash
+        run: echo "##[set-output name=version;]$(earthly --artifact +version/version version 2>&1; cat version)"
+        id: determine_version
+
+      - name: Determine tags
+        shell: bash
+        run: echo "##[set-output name=tags;]$(echo -n "${{ steps.determine_version.outputs.version }}" > tags; if [[ "${{ steps.extract_branch.outputs.branch }}" == "main" ]]; then echo ",latest" >> tags; cat tags; fi)"
+        id: determine_tags
+
       - name: Build and push image
         run: |
-          earthly --artifact +version/version version && \
-          earthly --ci --push +image --tag=$(cat version) --save_cmd=SAVE_IMAGE_GHCR
+          earthly --ci --push +image --tags=${{ steps.determine_tags.outputs.tags }} --save_cmd=SAVE_IMAGE_GHCR
 
   charts:
     permissions: write-all
