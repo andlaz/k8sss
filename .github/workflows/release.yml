@@ -71,7 +71,9 @@ jobs:
       - name: Build and push image
         shell: bash
         run: |
-          earthly --ci --push +image --tags=${{ env.tags }} --save_cmd=SAVE_IMAGE_GHCR
+          for tag in $(echo ${{ env.tags }} | tr "," "\n"); do
+            earthly --ci --push +image --save_cmd=SAVE_IMAGE_GHCR --tag=$tag
+          done
 
   charts:
     needs: [tests, container]

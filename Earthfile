@@ -26,27 +26,23 @@ RUST_BUILD_ENV:
 SAVE_IMAGE:
     COMMAND
     ARG --required image_name
-    ARG --required tags
-    FOR --sep , tag IN $tags
-        SAVE IMAGE ${image_name}:${tag}
-    END
+    ARG --required tag
+    SAVE IMAGE ${image_name}:${tag}
 
 SAVE_IMAGE_PUSH:
     COMMAND
     ARG EARTHLY_GIT_SHORT_HASH
     ARG EARTHLY_TARGET_TAG_DOCKER
-    ARG --required tags
+    ARG --required tag
     ARG --required image_name
-    FOR --sep , tag IN $tags
-        SAVE IMAGE --push ${image_name}:${tag}
-    END
+    SAVE IMAGE --push ${image_name}:${tag}
 
 SAVE_IMAGE_GHCR:
     COMMAND
-    ARG --required tags
+    ARG --required tag
     ARG org_name=andlaz
     ARG repo_name=k8sss
-    DO +SAVE_IMAGE_PUSH --image_name="ghcr.io/${org_name}/${repo_name}" --tags=${tags}
+    DO +SAVE_IMAGE_PUSH --image_name="ghcr.io/${org_name}/${repo_name}" --tag=${tag}
 
 style:
     ARG --required version
@@ -67,15 +63,15 @@ build:
 
 image:
     ARG style=false
-    FROM debian:buster
+    FROM scratch
     COPY (+build/k8sss --style $style) /k8sss
 
     ENTRYPOINT ["/k8sss"]
 
     ARG save_cmd="SAVE_IMAGE"
     ARG name="k8sss"
-    ARG --required tags
-    DO .+${save_cmd} --image_name=$name --tags=$tags
+    ARG --required tag
+    DO .+${save_cmd} --image_name=$name --tag=$tag
 
 chart:
     FROM debian:buster
