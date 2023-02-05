@@ -1,0 +1,8 @@
+apiVersion: v2
+name: test
+version: 0.1.0
+description: A chart that tests / compiles in to templates, the k8sss helper functions
+dependencies:
+- name: k8sss
+  version: 0.1.0
+  repository: file://../k8sss

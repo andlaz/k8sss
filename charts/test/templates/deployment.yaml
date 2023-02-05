@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      initContainers:
+        {{- include "k8sss.wait.until.maxUnavailEp" (list .Release.Namespace (printf "%s-grub" .Release.Name) 0) | indent 8 }}
+        {{- include "k8sss.wait.until.minEp" (list .Release.Namespace (printf "%s-grub" .Release.Name) 1) | indent 8 }}
+        {{- include "k8sss.wait.until.job" (list .Release.Namespace (printf "%s-cleanup" .Release.Name)) | indent 8 }}
+      containers:
+        - name: some-container
+          image: "busybox"
+          command: ["sleep", "10"]

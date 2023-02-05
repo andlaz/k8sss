@@ -73,9 +73,12 @@ jobs:
       - name: Install Earthly
         run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.30/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
 
-      - name: Build chart
+      - name: Build library chart
         run: |
             mkdir -p .cr-release-packages && earthly --artifact +chart/k8sss*.tgz .cr-release-packages/
+
+      - name: Test library chart
+        run: cd charts/test && helm dep up && helm template .
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0

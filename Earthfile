@@ -91,6 +91,17 @@ chart:
 
     SAVE ARTIFACT /k8sss/charts/k8sss/k8sss*.tgz
 
+test-chart:
+    FROM debian:buster
+
+    DO +BUILD_DEPS
+    WORKDIR /k8sss
+    COPY --dir charts /k8sss/
+
+    RUN cd charts/test && \
+        helm dep up && \
+        helm --debug template .
+
 version:
     FROM gittools/gitversion:5.12.0-ubuntu.18.04-6.0
 
