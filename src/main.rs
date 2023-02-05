@@ -43,24 +43,21 @@ async fn main() -> Result<(), anyhow::Error> {
                                     kube::begin_watching_service(
                                         namespace.unwrap_or("default".to_string()),
                                         name,
-                                        move |_, endpoints| {
-                                            if endpoints.items.is_empty() == false {
-                                                let unready_count = endpoints
-                                                    .items
-                                                    .iter()
-                                                    .flat_map(|eps| eps.endpoints.clone())
-                                                    .filter(|ep| {
-                                                        ep.conditions.clone().map_or(
-                                                            false,
-                                                            |conditions| {
-                                                                conditions.ready.unwrap_or(false)
-                                                            },
-                                                        ) == false
-                                                    })
-                                                    .count();
-                                                if unready_count <= lte as usize {
-                                                    std::process::exit(0);
-                                                }
+                                        move |_, eps| {
+                                            let unready_count = eps
+                                                .endpoints
+                                                .iter()
+                                                .filter(|ep| {
+                                                    ep.conditions.clone().map_or(
+                                                        false,
+                                                        |conditions| {
+                                                            conditions.ready.unwrap_or(false)
+                                                        },
+                                                    ) == false
+                                                })
+                                                .count();
+                                            if unready_count <= lte as usize {
+                                                std::process::exit(0);
                                             }
                                         },
                                     )
@@ -78,24 +75,22 @@ async fn main() -> Result<(), anyhow::Error> {
                                     kube::begin_watching_service(
                                         namespace.unwrap_or("default".to_string()),
                                         name,
-                                        move |_, endpoints| {
-                                            if endpoints.items.is_empty() == false {
-                                                let ready_count = endpoints
-                                                    .items
-                                                    .iter()
-                                                    .flat_map(|eps| eps.endpoints.clone())
-                                                    .filter(|ep| {
-                                                        ep.conditions.clone().map_or(
-                                                            false,
-                                                            |conditions| {
-                                                                conditions.ready.unwrap_or(false)
-                                                            },
-                                                        )
-                                                    })
-                                                    .count();
-                                                if ready_count >= gte as usize {
-                                                    std::process::exit(0);
-                                                }
+                                        move |_, eps| {
+                                            let ready_count = eps
+                                                .endpoints
+                                                .iter()
+                                                .filter(|ep| {
+                                                    ep.conditions.clone().map_or(
+                                                        false,
+                                                        |conditions| {
+                                                            conditions.ready.unwrap_or(false)
+                                                        },
+                                                    )
+                                                })
+                                                .count();
+
+                                            if ready_count >= gte as usize {
+                                                std::process::exit(0);
                                             }
                                         },
                                     )
