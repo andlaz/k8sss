@@ -33,22 +33,27 @@ jobs:
 
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+        run: echo "branch_name=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
       - name: Determine version
         shell: bash
-        run: echo "##[set-output name=version;]$(earthly --artifact +version/version version 2>&1; cat version)"
-        id: determine_version
+        run: |
+          earthly --artifact +version/version version && \
+          echo "version=$(cat version)" >> $GITHUB_ENV
 
       - name: Determine tags
         shell: bash
-        run: echo "##[set-output name=tags;]$(echo -n "${{ steps.determine_version.outputs.version }}" > tags; if [[ "${{ steps.extract_branch.outputs.branch }}" == "main" ]]; then echo ",latest" >> tags; cat tags; fi)"
-        id: determine_tags
+        run: |
+          if [[ "${{ steps.extract_branch.outputs.branch }}" == "main" ]];
+          then
+            echo "tags=${{ env.version }},latest" >> $GITHUB_ENV
+          else
+            echo "tags=${{ env.version }}" >> $GITHUB_ENV
+            fi
 
       - name: Build and push image
         run: |
-          earthly --ci --push +image --tags=${{ steps.determine_tags.outputs.tags }} --save_cmd=SAVE_IMAGE_GHCR
+          earthly --ci --push +image --tags=${{ env.tags }} --save_cmd=SAVE_IMAGE_GHCR
 
   charts:
     permissions: write-all
