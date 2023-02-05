@@ -11,7 +11,25 @@ on:
       - main
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Earthly
+        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.30/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
+
+      - name: Chart tests
+        run: |
+          earthly --ci +test-chart
+  
+
   container:
+    needs: tests
+    image: ghcr.io/earthly/earthly:v0.6.30
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
@@ -57,6 +75,7 @@ jobs:
           earthly --ci --push +image --tags=${{ env.tags }} --save_cmd=SAVE_IMAGE_GHCR
 
   charts:
+    needs: [tests, container]
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
