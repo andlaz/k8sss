@@ -54,17 +54,22 @@ style:
 
 build:
     DO +RUST_BUILD_ENV
-    RUN cargo build --release
+    RUN cargo build --release && chmod +x target/release/k8sss
     ARG style=false
     IF [ "$style" = "true" ]
         BUILD +style
     END
     SAVE ARTIFACT target/release/k8sss /k8sss
 
+libgcc:
+    FROM gcr.io/distroless/cc-debian11
+    SAVE ARTIFACT /lib/x86_64-linux-gnu/libgcc_s.so.1
+
 image:
     ARG style=false
-    FROM scratch
+    FROM gcr.io/distroless/base-nossl-debian11
     COPY (+build/k8sss --style $style) /k8sss
+    COPY (+libgcc/libgcc_s.so.1) /lib/x86_64-linux-gnu/libgcc_s.so.1
 
     ENTRYPOINT ["/k8sss"]
 
