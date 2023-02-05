@@ -102,6 +102,16 @@ entries:
     - https://github.com/andlaz/k8sss/releases/download/k8sss-0.2.0-alpha1/k8sss-0.2.0-alpha1.tgz
     version: 0.2.0-alpha1
   - apiVersion: v2
+    created: "2023-02-05T21:06:44.513338075Z"
+    description: A library chart that provides helpers to define init containers that
+      verify live Service endpoint counts are at an expected number, or a Job has
+      successfully completed.
+    digest: 619bf6f8ee79ec59389aad8d45adee9045fb1238cc053d0a1624c2e9a8a81fee
+    name: k8sss
+    urls:
+    - https://github.com/andlaz/k8sss/releases/download/k8sss-0.2.0-PullRequest0001-30/k8sss-0.2.0-PullRequest0001-30.tgz
+    version: 0.2.0-PullRequest0001-30
+  - apiVersion: v2
     created: "2023-02-05T20:38:24.508962416Z"
     description: A library chart that provides helpers to define init containers that
       verify live Service endpoint counts are at an expected number, or a Job has
@@ -201,4 +211,4 @@ entries:
     urls:
     - https://github.com/andlaz/k8sss/releases/download/k8sss-0.1.0-alpha12/k8sss-0.1.0-alpha12.tgz
     version: 0.1.0-alpha12
-generated: "2023-02-05T20:38:24.509231923Z"
+generated: "2023-02-05T21:06:44.513639976Z"
