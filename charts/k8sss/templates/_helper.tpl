@@ -7,7 +7,7 @@
 - name: wait-for-{{ $name }}
   image: {{ include "k8sss.image" $g }}
   imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
-  args: ["wait", "until", "service", "unavailable-endpoints", "--lte", $lte, $name, $namespace]
+  args: ["wait", "until", "service", "unavailable-endpoints", "--lte", {{- $lte | quote  }}, {{- $name | quote  }}, {{- $namespace | quote  }}]
   resources:
     requests:
       cpu: 100m
@@ -23,7 +23,7 @@
 - name: wait-for-{{ $name }}
   image: {{ include "k8sss.image" $g }}
   imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
-  args: ["wait", "until", "service", "available-endpoints", "--gte", $gte, $name, $namespace]
+  args: ["wait", "until", "service", "available-endpoints", "--gte", {{- $gte | quote  }}, {{- $name | quote  }}, {{- $namespace | quote  }}]
   resources:
     requests:
       cpu: 100m
@@ -38,7 +38,7 @@
 - name: wait-for-{{ $name }}
   image: {{ include "k8sss.image" $g }}
   imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
-  args: ["wait", "until", "job", "ready", $name, $namespace]
+  args: ["wait", "until", "job", "ready", {{- $name | quote }}, {{- $namespace | quote  }}]
   resources:
     requests:
     cpu: 100m
