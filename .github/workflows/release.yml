@@ -55,7 +55,9 @@ jobs:
       - name: Determine version
         shell: bash
         run: |
-          git status; git branch -l; \
+          git fetch origin refs/remotes/*:refs/remotes/* && \
+          git config --bool core.bare false; \
+          git pull origin; git status; git branch -l; \
           earthly --artifact +version/version version && \
           echo "version=$(cat version)" >> $GITHUB_ENV
 
