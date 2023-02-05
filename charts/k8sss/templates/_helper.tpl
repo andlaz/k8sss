@@ -43,10 +43,10 @@
 {{- end -}}
 
 {{- define "k8sss.image" }}
-    {{- if $.Values.global -}}
+    {{- if .Values.global -}}
         {{- if $.Values.global.k8sss -}}
             {{- if $.Values.global.k8sss.image -}}
-                {{- .Values.global.k8sss.image -}}
+                {{- $.Values.global.k8sss.image -}}
             {{- else -}}
                 {{- "ghcr.io/andlaz/k8sss:latest" -}}
             {{- end -}}
@@ -59,17 +59,17 @@
 {{- end -}}
 
 {{- define "k8sss.imagePullPolicy" }}
-    {{- if $.Values.global }}
+    {{- if .Values.global }}
         {{- if $.Values.global.k8sss }}
             {{- if $.Values.global.k8sss.imagePullPolicy }}
-                {{- .Values.global.k8sss.imagePullPolicy }}
+                {{- $.Values.global.k8sss.imagePullPolicy }}
             {{- else }}
-                {{- "Always" }}
+                {{- "Always" -}}
             {{- end }}
         {{- else }}
-            {{- "Always" }}
+            {{- "Always" -}}
         {{- end }}
     {{- else }}
-        {{- "Always" }}
+        {{- "Always" -}}
     {{- end }}
 {{- end -}}
