@@ -42,6 +42,13 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Fetch branch refs
+        run: |
+          for ref in `git branch -r | grep origin | grep -v HEAD | grep -v 'pull/'`; do \
+            git branch --track ${ref#origin/} $ref; \
+          done && \
+          git fetch --all
+
       - name: Install Earthly
         run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.30/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
 
@@ -55,10 +62,6 @@ jobs:
       - name: Determine version
         shell: bash
         run: |
-          for ref in `git branch -r | grep origin | grep -v HEAD | grep -v 'pull/'`; do \
-            git branch --track ${ref#origin/} $ref; \
-          done && \
-          git fetch --all && \
           earthly --artifact +version/version version && \
           echo "version=$(cat version)" >> $GITHUB_ENV
 
@@ -93,6 +96,13 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Fetch branch refs
+        run: |
+          for ref in `git branch -r | grep origin | grep -v HEAD | grep -v 'pull/'`; do \
+            git branch --track ${ref#origin/} $ref; \
+          done && \
+          git fetch --all
 
       - name: Install Earthly
         run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.30/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
