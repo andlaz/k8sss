@@ -65,14 +65,14 @@ If you are managing your resources in a helm chart, you can simply depend on the
 
 ```bash
 #     initContainers:
-      {{- include "k8ss.maxUnavailEp" (list .Release.Namespace "grub" 0) | indent 6 }} # all endpoints must be available
-      {{- include "k8ss.minEp" (list .Release.Namespace "ale" 1) | indent 6 }} # at least one endpoint must be available
-      {{- include "k8ss.job" (list .Release.Namespace "cleanup-job") | indent 6 }} # wait for job to complete
+      {{- include "k8sss.wait.until.maxUnavailEp" (list .Release.Namespace "grub" 0) | indent 6 }} # all endpoints must be available
+      {{- include "k8sss.wait.until.minEp" (list .Release.Namespace "ale" 1) | indent 6 }} # at least one endpoint must be available
+      {{- include "k8sss.wait.until.job" (list .Release.Namespace "cleanup-job") | indent 6 }} # wait for job to complete
 ```
 
 #### Changing the image in the init container
 
-You can update the k8sss image name by setting the `k8sss.image` value on the library chart dependency, e.g. in your `Chart.yaml`:
+You can update the k8sss image name and image pull policy by setting the `k8sss.image` and `k8sss.imagePullPolicy` values on the library chart dependency, e.g. in your `Chart.yaml`:
 
 ```bash
 dependencies:
@@ -81,12 +81,13 @@ dependencies:
   repository: https://andlaz.github.io/helm-charts
 ```
 
-Then, at helm install time:
+Then, at helm install time ( or in values.yaml ):
 ```
 helm upgrade --install \
     my-release \
     my-chart \
-    --set k8sss.image=some/other:image
+    --set k8sss.image=some/other:image \
+    --set k8sss.imagePullPolicy=Never # preloaded
 ```
 
 ## Alternatives
