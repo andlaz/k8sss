@@ -57,7 +57,7 @@ jobs:
         run: |
           git fetch origin refs/remotes/*:refs/remotes/* && \
           git config --bool core.bare false; \
-          git pull origin; git status; git branch -l; \
+          git status; git branch -l; \
           earthly --artifact +version/version version && \
           echo "version=$(cat version)" >> $GITHUB_ENV
 
