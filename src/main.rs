@@ -20,12 +20,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let fmt = tracing_subscriber::fmt::layer();
     let registry = Registry::default().with(filter).with(fmt);
 
-    let jaeger = opentelemetry_jaeger::new_agent_pipeline()
-        .with_service_name("k8sss")
-        .install_batch(opentelemetry::runtime::Tokio)
-        .expect("Failed to initialize Jaeger pipeline");
-    let opentelemetry = tracing_opentelemetry::layer().with_tracer(jaeger);
-    registry.with(opentelemetry).init();
+    registry.init();
 
     let cli = Cli::parse();
 
