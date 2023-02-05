@@ -114,7 +114,8 @@ version:
 
     DO +BUILD_DEPS
 
-    RUN set -x; cd /repo && \
+    RUN set -xe; cd /repo && \
+        (/tools/dotnet-gitversion || true) && \
         /tools/dotnet-gitversion /config gitversion.yml > version.json && cat version.json && \
         cat version.json | jq -r .LegacySemVer > version
 
