@@ -102,7 +102,8 @@ test-chart:
         helm dep up && \
         helm --debug template . \
             --set global.k8sss.image="k8sss:local" \
-            --set global.k8sss.imagePullPolicy=Never
+            --set global.k8sss.imagePullPolicy=Never \
+            --set global.k8sss.debug=true
 
 version:
     FROM gittools/gitversion:5.12.0-ubuntu.18.04-6.0

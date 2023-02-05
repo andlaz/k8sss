@@ -8,6 +8,11 @@
   image: {{ include "k8sss.image" $g }}
   imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
   args: ["wait", "until", "service", "unavailable-endpoints", "--lte", {{- $lte | quote  }}, {{- $name | quote  }}, {{- $namespace | quote  }}]
+  {{ if (include "k8sss.debug" $g) -}}
+  env:
+  - name: RUST_LOG
+  value: "debug"
+  {{ end}}
   resources:
     requests:
       cpu: 100m
@@ -24,6 +29,11 @@
   image: {{ include "k8sss.image" $g }}
   imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
   args: ["wait", "until", "service", "available-endpoints", "--gte", {{- $gte | quote  }}, {{- $name | quote  }}, {{- $namespace | quote  }}]
+  {{ if (include "k8sss.debug" $g) -}}
+  env:
+  - name: RUST_LOG
+  value: "debug"
+  {{ end -}}
   resources:
     requests:
       cpu: 100m
@@ -39,10 +49,35 @@
   image: {{ include "k8sss.image" $g }}
   imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
   args: ["wait", "until", "job", "ready", {{- $name | quote }}, {{- $namespace | quote  }}]
+  {{ if (include "k8sss.debug" $g) -}}
+  env:
+  - name: RUST_LOG
+  value: "debug"
+  {{ end -}}
   resources:
     requests:
     cpu: 100m
     memory: 128M
+{{- end -}}
+
+{{- define "k8sss.debug" -}}
+  {{- if .Values.global -}}
+    {{- if $.Values.global -}}
+      {{- if $.Values.global.k8sss -}}
+        {{- if $.Values.global.k8sss.debug -}}
+          {{- $.Values.global.k8sss.debug -}}
+        {{- else -}}
+          {{- false -}}
+        {{- end -}}
+      {{- else -}}
+        {{- false -}}
+      {{- end -}}
+    {{- else -}}
+      {{- false -}}
+    {{- end -}}
+  {{- else -}}
+    {{- false -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "k8sss.image" -}}
