@@ -33,7 +33,7 @@ jobs:
 
       - name: Extract branch name
         shell: bash
-        run: echo "branch_name=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
       - name: Determine version
         shell: bash
@@ -44,14 +44,15 @@ jobs:
       - name: Determine tags
         shell: bash
         run: |
-          if [[ "${{ steps.extract_branch.outputs.branch }}" == "main" ]];
+          if [[ "${{ env.branch }}" == "main" ]];
           then
             echo "tags=${{ env.version }},latest" >> $GITHUB_ENV
           else
             echo "tags=${{ env.version }}" >> $GITHUB_ENV
-            fi
+          fi
 
       - name: Build and push image
+        shell: bash
         run: |
           earthly --ci --push +image --tags=${{ env.tags }} --save_cmd=SAVE_IMAGE_GHCR
 
