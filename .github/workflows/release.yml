@@ -99,10 +99,12 @@ jobs:
 
       - name: Fetch branch refs
         run: |
-          for ref in `git branch -r | grep origin | grep -v HEAD | grep -v 'pull/'`; do \
-            git branch --track ${ref#origin/} $ref; \
-          done && \
-          git fetch --all
+          if [ -z "${{ github.event.number }}" ]; then
+            for ref in `git branch -r | grep origin | grep -v HEAD | grep -v 'pull/'`; do \
+              git branch --track ${ref#origin/} $ref; \
+            done && \
+            git fetch --all          
+          fi
 
       - name: Install Earthly
         run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.30/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
