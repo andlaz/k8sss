@@ -65,14 +65,14 @@ If you are managing your resources in a helm chart, you can simply depend on the
 
 ```bash
 #     initContainers:
-      {{- include "k8sss.wait.until.maxUnavailEp" (list .Release.Namespace "grub" 0) | indent 6 }} # all endpoints must be available
-      {{- include "k8sss.wait.until.minEp" (list .Release.Namespace "ale" 1) | indent 6 }} # at least one endpoint must be available
-      {{- include "k8sss.wait.until.job" (list .Release.Namespace "cleanup-job") | indent 6 }} # wait for job to complete
+      {{- include "k8sss.wait.until.maxUnavailEp" (list .Release.Namespace "grub" 0 $) | indent 6 }} # all endpoints must be available
+      {{- include "k8sss.wait.until.minEp" (list .Release.Namespace "ale" 1 $) | indent 6 }} # at least one endpoint must be available
+      {{- include "k8sss.wait.until.job" (list .Release.Namespace "cleanup-job" $) | indent 6 }} # wait for job to complete
 ```
 
 #### Changing the image in the init container
 
-You can update the k8sss image name and image pull policy by setting the `global.k8sss.image` and `global.k8sss.imagePullPolicy` values on the library chart dependent, e.g. in your Chart.
+You can update the k8sss image name and image pull policy by setting the `global.k8sss.image` and `global.k8sss.imagePullPolicy` values on the library chart dependent, e.g. in your chart:
 
 ```bash
 dependencies:

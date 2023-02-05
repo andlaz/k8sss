@@ -3,9 +3,10 @@
 {{- $namespace := index $args 0}}
 {{- $name := index $args 1}}
 {{- $lte := index $args 2}}
+{{- $g := index $args 3}}
 - name: wait-for-{{ $name }}
-  image: {{ include "k8sss.image" $ }}
-  imagePullPolicy: {{ include "k8sss.imagePullPolicy" $ }}
+  image: {{ include "k8sss.image" $g }}
+  imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
   args: ["wait", "until", "service", "unavailable-endpoints", "--lte", $lte, $name, $namespace]
   resources:
     requests:
@@ -18,9 +19,10 @@
 {{- $namespace := index $args 0}}
 {{- $name := index $args 1}}
 {{- $gte := index $args 2}}
+{{- $g := index $args 3}}
 - name: wait-for-{{ $name }}
-  image: {{ include "k8sss.image" $ }}
-  imagePullPolicy: {{ include "k8sss.imagePullPolicy" $ }}
+  image: {{ include "k8sss.image" $g }}
+  imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
   args: ["wait", "until", "service", "available-endpoints", "--gte", $gte, $name, $namespace]
   resources:
     requests:
@@ -32,21 +34,26 @@
 {{- $args := . -}}
 {{- $namespace := index $args 0}}
 {{- $name := index $args 1}}
+{{- $g := index $args 2}}
 - name: wait-for-{{ $name }}
-  image: {{ include "k8sss.image" $ }}
-  imagePullPolicy: {{ include "k8sss.imagePullPolicy" $ }}
-    args: ["wait", "until", "job", "ready", $name, $namespace]
-    resources:
-        requests:
-        cpu: 100m
-        memory: 128M
+  image: {{ include "k8sss.image" $g }}
+  imagePullPolicy: {{ include "k8sss.imagePullPolicy" $g }}
+  args: ["wait", "until", "job", "ready", $name, $namespace]
+  resources:
+    requests:
+    cpu: 100m
+    memory: 128M
 {{- end -}}
 
-{{- define "k8sss.image" }}
+{{- define "k8sss.image" -}}
     {{- if .Values.global -}}
-        {{- if $.Values.global.k8sss -}}
-            {{- if $.Values.global.k8sss.image -}}
-                {{- $.Values.global.k8sss.image -}}
+        {{- if $.Values.global -}}
+            {{- if $.Values.global.k8sss -}}
+                {{- if $.Values.global.k8sss.image -}}
+                    {{- $.Values.global.k8sss.image -}}
+                {{- else -}}
+                    {{- "ghcr.io/andlaz/k8sss:latest" -}}
+                {{- end -}}
             {{- else -}}
                 {{- "ghcr.io/andlaz/k8sss:latest" -}}
             {{- end -}}
