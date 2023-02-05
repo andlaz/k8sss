@@ -55,7 +55,7 @@ jobs:
       - name: Determine version
         shell: bash
         run: |
-          git fetch origin "refs/heads/*:refs/pull/*:refs/tags/*" && \
+          git fetch --all && \
           earthly --artifact +version/version version && \
           echo "version=$(cat version)" >> $GITHUB_ENV
 
