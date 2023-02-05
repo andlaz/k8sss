@@ -1,3 +1,2 @@
 image: ghcr.io/andlaz/k8sss:latest
 imagePullPolicy: Always
-version: 0.1.0
