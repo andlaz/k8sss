@@ -2,7 +2,7 @@ use futures_util::StreamExt;
 use k8s_openapi::api::batch::v1::Job;
 use k8s_openapi::api::core::v1::Service;
 use k8s_openapi::api::discovery::v1::EndpointSlice;
-use kube::api::{ListParams, ObjectList};
+use kube::api::ListParams;
 use kube::runtime::{watcher, WatchStreamExt};
 use kube::{Api, Client};
 
@@ -42,35 +42,26 @@ pub(crate) async fn begin_watching_job(
 pub(crate) async fn begin_watching_service(
     namespace: String,
     name: String,
-    f: impl Fn(&Service, &ObjectList<EndpointSlice>) + Send + Sync + 'static,
+    f: impl Fn(&Service, &EndpointSlice) + Send + Sync + 'static,
 ) -> anyhow::Result<()> {
     if let Ok(incluster_config) = kube::Config::incluster_dns() {
         if let Ok(client) = kube::Client::try_from(incluster_config) {
-            let api: Api<Service> = Api::namespaced(client, &namespace);
-            let endpoint_slices: Api<EndpointSlice> =
-                Api::namespaced(Client::try_default().await?, &namespace);
+            let api: Api<EndpointSlice> = Api::namespaced(client, &namespace);
+            let services: Api<Service> = Api::namespaced(Client::try_default().await?, &namespace);
 
-            let lp = ListParams::default().fields(&format!("metadata.name={}", name));
+            let lp = ListParams::default().labels(&format!("kubernetes.io/service-name={}", name));
             watcher(api, lp)
                 .applied_objects()
                 .for_each(|event| async {
                     match event {
-                        Ok(service) => {
-                            match endpoint_slices
-                                .list(
-                                    &ListParams::default()
-                                        .labels(&format!("kubernetes.io/service-name={}", name)),
-                                )
-                                .await
-                            {
-                                Ok(eps) => {
-                                    f(&service, &eps);
-                                }
-                                Err(e) => {
-                                    error!("Error getting EndpointSlices for Service: {:?}", e);
-                                }
+                        Ok(eps) => match services.get(&name).await {
+                            Ok(service) => {
+                                f(&service, &eps);
                             }
-                        }
+                            Err(e) => {
+                                error!("Error getting EndpointSlices for Service: {:?}", e);
+                            }
+                        },
                         Err(e) => {
                             error!("Error watching Service: {:?}", e);
                         }
