@@ -106,12 +106,12 @@
             {{- if $.Values.global.k8sss.imagePullPolicy }}
                 {{- $.Values.global.k8sss.imagePullPolicy }}
             {{- else }}
-                {{- "Always" -}}
+                {{- "IfNotPresent" -}}
             {{- end }}
         {{- else }}
-            {{- "Always" -}}
+            {{- "IfNotPresent" -}}
         {{- end }}
     {{- else }}
-        {{- "Always" -}}
+        {{- "IfNotPresent" -}}
     {{- end }}
 {{- end -}}
