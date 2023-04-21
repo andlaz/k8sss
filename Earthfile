@@ -104,11 +104,17 @@ test-chart:
         helm --debug template .
 
     RUN cd charts/test && \
+        mkdir out && \
         helm dep up && \
-        helm --debug template . \
+        helm template . \
             --set global.k8sss.image="k8sss:local" \
             --set global.k8sss.imagePullPolicy=Never \
-            --set global.k8sss.debug=true
+            --set global.k8sss.debug=true \
+            --output-dir out && \
+        cat out/test/templates/deployment.yaml \
+            | yq -e 'select(.spec.template.spec.initContainers[].image == "k8sss:local")' && \
+        cat out/test/templates/deployment.yaml \
+            | yq -e 'select(.spec.template.spec.initContainers[].imagePullPolicy == "Never")' && \
 
 version:
     FROM gittools/gitversion:5.12.0-ubuntu.18.04-6.0
