@@ -127,7 +127,7 @@ test-chart:
         cat out/test/templates/deployment.yaml \
             | yq -e 'select(.spec.template.spec.initContainers[].image == "k8sss:local")' && \
         cat out/test/templates/deployment.yaml \
-            | yq -e 'select(.spec.template.spec.initContainers[].imagePullPolicy == "Never")' && \
+            | yq -e 'select(.spec.template.spec.initContainers[].imagePullPolicy == "Never")'
 
 version:
     FROM gittools/gitversion:5.12.0-ubuntu.18.04-6.0
