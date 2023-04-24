@@ -91,7 +91,7 @@ jobs:
         run: |
           for tag in $(echo ${{ env.tags }} | tr "," " "); do
             earthly --ci --push +image --save_cmd=SAVE_IMAGE_GHCR --tag=$tag
-            earthly --ci --push +image --save_cmd=SAVE_IMAGE_GHCR --base_image=./+baseimage-centos7 --tag=$tag --tag_suffix=centos7
+            earthly --ci --push +image --save_cmd=SAVE_IMAGE_GHCR --base_image=./+baseimage-centos7 --tag=$tag --tag_suffix=-centos7
           done
 
   charts:
