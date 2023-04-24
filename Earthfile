@@ -11,7 +11,7 @@ BUILD_DEPS:
 
 RUST_BUILD_ENV:
     COMMAND
-    FROM rust:1-buster
+    FROM clux/muslrust:stable
 
     WORKDIR /k8sss
 
@@ -57,12 +57,12 @@ style:
 
 build:
     DO +RUST_BUILD_ENV
-    RUN cargo build --release && chmod +x target/release/k8sss
+    RUN cargo build --release && chmod +x target/x86_64-unknown-linux-musl/release/k8sss
     ARG style=false
     IF [ "$style" = "true" ]
         BUILD +style
     END
-    SAVE ARTIFACT target/release/k8sss /k8sss
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/k8sss /k8sss
 
 libgcc:
     FROM gcr.io/distroless/cc-debian11
@@ -70,7 +70,7 @@ libgcc:
 
 image:
     ARG style=false
-    ARG base_image=gcr.io/distroless/base-debian11
+    ARG base_image=gcr.io/distroless/static
     FROM ${base_image}
     COPY (+build/k8sss --style $style) /k8sss
     COPY --dir (+image-supplemental/out --base_image=${base_image}) /
