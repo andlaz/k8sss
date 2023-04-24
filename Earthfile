@@ -1,4 +1,4 @@
-VERSION 0.6
+VERSION --arg-scope-and-set 0.7
 
 BUILD_DEPS:
     COMMAND
@@ -27,7 +27,8 @@ SAVE_IMAGE:
     COMMAND
     ARG --required image_name
     ARG --required tag
-    SAVE IMAGE ${image_name}:${tag}
+    ARG tag_suffix
+    SAVE IMAGE ${image_name}:${tag}${tag_suffix}
 
 SAVE_IMAGE_PUSH:
     COMMAND
@@ -35,14 +36,16 @@ SAVE_IMAGE_PUSH:
     ARG EARTHLY_TARGET_TAG_DOCKER
     ARG --required tag
     ARG --required image_name
-    SAVE IMAGE --push ${image_name}:${tag}
+    ARG tag_suffix
+    SAVE IMAGE --push ${image_name}:${tag}${tag_suffix}
 
 SAVE_IMAGE_GHCR:
     COMMAND
     ARG --required tag
+    ARG tag_suffix
     ARG org_name=andlaz
     ARG repo_name=k8sss
-    DO +SAVE_IMAGE_PUSH --image_name="ghcr.io/${org_name}/${repo_name}" --tag=${tag}
+    DO +SAVE_IMAGE_PUSH --image_name="ghcr.io/${org_name}/${repo_name}" --tag=${tag} --tag_suffix=${tag_suffix}
 
 style:
     ARG --required version
@@ -67,16 +70,36 @@ libgcc:
 
 image:
     ARG style=false
-    FROM gcr.io/distroless/base-nossl-debian11
+    ARG base_image=gcr.io/distroless/base-debian11
+    FROM ${base_image}
     COPY (+build/k8sss --style $style) /k8sss
-    COPY (+libgcc/libgcc_s.so.1) /lib/x86_64-linux-gnu/libgcc_s.so.1
+    COPY --dir (+image-supplemental/out --base_image=${base_image}) /
 
     ENTRYPOINT ["/k8sss"]
 
     ARG save_cmd="SAVE_IMAGE"
     ARG name="k8sss"
     ARG --required tag
-    DO .+${save_cmd} --image_name=$name --tag=$tag
+    ARG tag_suffix
+    DO .+${save_cmd} --image_name=$name --tag=$tag --tag_suffix=$tag_suffix
+
+image-supplemental:
+    FROM ubuntu:20.04
+
+    RUN mkdir -p /tmp/out
+    ARG --required base_image
+    IF [ "$base_image" = "gcr.io/distroless/base-debian11" ]
+        RUN mkdir -p /tmp/out/lib/x86_64-linux-gnu
+        COPY (+libgcc/libgcc_s.so.1) /tmp/out/lib/x86_64-linux-gnu/libgcc_s.so.1
+    END
+
+    SAVE ARTIFACT /tmp/out
+
+baseimage-centos7:
+    FROM centos:7
+    RUN yum update -y
+    # default to a non-root user for centos builds
+    USER nobody
 
 chart:
     FROM debian:buster
@@ -104,11 +127,17 @@ test-chart:
         helm --debug template .
 
     RUN cd charts/test && \
+        mkdir out && \
         helm dep up && \
-        helm --debug template . \
+        helm template . \
             --set global.k8sss.image="k8sss:local" \
             --set global.k8sss.imagePullPolicy=Never \
-            --set global.k8sss.debug=true
+            --set global.k8sss.debug=true \
+            --output-dir out && \
+        cat out/test/templates/deployment.yaml \
+            | yq -e 'select(.spec.template.spec.initContainers[].image == "k8sss:local")' && \
+        cat out/test/templates/deployment.yaml \
+            | yq -e 'select(.spec.template.spec.initContainers[].imagePullPolicy == "Never")'
 
 version:
     FROM gittools/gitversion:5.12.0-ubuntu.18.04-6.0

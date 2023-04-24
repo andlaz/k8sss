@@ -19,8 +19,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch branch refs
+        run: |
+          if [ -n "${{ github.event.number }}" ]; then
+            for ref in `git branch -r | grep origin | grep -v HEAD | grep -v 'pull/'`; do \
+              git branch --track ${ref#origin/} $ref; \
+            done && \
+            git fetch --all          
+          fi
+
       - name: Install Earthly
-        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.30/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
+        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.7.4/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
 
       - name: Chart tests
         run: |
@@ -52,7 +61,7 @@ jobs:
           fi
 
       - name: Install Earthly
-        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.30/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
+        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.7.4/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
 
       - name: Log in to ghcr.io
         run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
@@ -82,6 +91,7 @@ jobs:
         run: |
           for tag in $(echo ${{ env.tags }} | tr "," " "); do
             earthly --ci --push +image --save_cmd=SAVE_IMAGE_GHCR --tag=$tag
+            earthly --ci --push +image --save_cmd=SAVE_IMAGE_GHCR --base_image=./+baseimage-centos7 --tag=$tag --tag_suffix=centos7
           done
 
   charts:
@@ -109,7 +119,7 @@ jobs:
           fi
 
       - name: Install Earthly
-        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.30/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
+        run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.7.4/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
 
       - name: Build library chart
         run: |
