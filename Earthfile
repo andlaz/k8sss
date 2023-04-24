@@ -73,9 +73,7 @@ image:
     ARG base_image=gcr.io/distroless/base-debian11
     FROM ${base_image}
     COPY (+build/k8sss --style $style) /k8sss
-    IF [ "$base_image" = "gcr.io/distroless/base-debian11" ]
-        COPY (+libgcc/libgcc_s.so.1) /lib/x86_64-linux-gnu/libgcc_s.so.1
-    END
+    COPY (+libgcc/libgcc_s.so.1) /lib/x86_64-linux-gnu/libgcc_s.so.1
 
     ENTRYPOINT ["/k8sss"]
 
