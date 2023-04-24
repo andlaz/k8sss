@@ -11,7 +11,7 @@ BUILD_DEPS:
 
 RUST_BUILD_ENV:
     COMMAND
-    FROM rust:1-buster
+    FROM clux/muslrust:stable
 
     WORKDIR /k8sss
 
@@ -57,23 +57,18 @@ style:
 
 build:
     DO +RUST_BUILD_ENV
-    RUN cargo build --release && chmod +x target/release/k8sss
+    RUN cargo build --release && chmod +x target/x86_64-unknown-linux-musl/release/k8sss
     ARG style=false
     IF [ "$style" = "true" ]
         BUILD +style
     END
-    SAVE ARTIFACT target/release/k8sss /k8sss
-
-libgcc:
-    FROM gcr.io/distroless/cc-debian11
-    SAVE ARTIFACT /lib/x86_64-linux-gnu/libgcc_s.so.1
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/k8sss /k8sss
 
 image:
     ARG style=false
-    ARG base_image=gcr.io/distroless/base-debian11
+    ARG base_image=gcr.io/distroless/static
     FROM ${base_image}
     COPY (+build/k8sss --style $style) /k8sss
-    COPY --dir (+image-supplemental/out --base_image=${base_image}) /
 
     ENTRYPOINT ["/k8sss"]
 
@@ -82,18 +77,6 @@ image:
     ARG --required tag
     ARG tag_suffix
     DO .+${save_cmd} --image_name=$name --tag=$tag --tag_suffix=$tag_suffix
-
-image-supplemental:
-    FROM ubuntu:20.04
-
-    RUN mkdir -p /tmp/out
-    ARG --required base_image
-    IF [ "$base_image" = "gcr.io/distroless/base-debian11" ]
-        RUN mkdir -p /tmp/out/lib/x86_64-linux-gnu
-        COPY (+libgcc/libgcc_s.so.1) /tmp/out/lib/x86_64-linux-gnu/libgcc_s.so.1
-    END
-
-    SAVE ARTIFACT /tmp/out
 
 baseimage-centos7:
     FROM centos:7
