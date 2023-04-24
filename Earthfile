@@ -73,7 +73,7 @@ image:
     ARG base_image=gcr.io/distroless/base-debian11
     FROM ${base_image}
     COPY (+build/k8sss --style $style) /k8sss
-    COPY (+libgcc/libgcc_s.so.1) /lib/x86_64-linux-gnu/libgcc_s.so.1
+    COPY --dir (+image-supplemental/out --base_image=${base_image}) /
 
     ENTRYPOINT ["/k8sss"]
 
@@ -82,6 +82,18 @@ image:
     ARG --required tag
     ARG tag_suffix
     DO .+${save_cmd} --image_name=$name --tag=$tag --tag_suffix=$tag_suffix
+
+image-supplemental:
+    FROM ubuntu:20.04
+
+    RUN mkdir -p /tmp/out
+    ARG --required base_image
+    IF [ "$base_image" = "gcr.io/distroless/base-debian11" ]
+        RUN mkdir -p /tmp/out/lib/x86_64-linux-gnu
+        COPY (+libgcc/libgcc_s.so.1) /tmp/out/lib/x86_64-linux-gnu/libgcc_s.so.1
+    END
+
+    SAVE ARTIFACT /tmp/out
 
 baseimage-centos7:
     FROM centos:7
